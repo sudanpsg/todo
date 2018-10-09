@@ -13,5 +13,10 @@ MongoClient.connect('mongodb://localhost:27017',(err,client)=>{
      }
    console.log(JSON.stringify(result.ops,undefined,2))
   })
+  col.find({text:"second text"}).count().then((count)=>{
+    console.log(count)
+  }).catch((err)=>{
+    console.log(err)
+  })
   client.close();
 })
