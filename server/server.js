@@ -20,16 +20,7 @@ const {ObjectId} = require('mongodb')
    })
  })
 
- app.post('/user',(req,res)=>{
-   var body =_.pick(req.body,['email','password'])
-   var user = new User(body)
-   user.save().then((user)=>{
-     res.send(user)
-   }).catch((e)=>{
-     console.log(e)
-     res.status(400).send()
-   })
- })
+
 
 app.get('/todos',(req,res)=>{
   Todo.find({text:"Complete the coding for project"}).then((todos)=>{
@@ -57,6 +48,35 @@ app.get('/todo/:id',(req,res)=>{
   }
 })
 
+
+app.get('/todos1/me',(req,res)=>{
+var token = req.header('x-auth')
+console.log(token)
+console.log('inside me guys')
+User.findbyToken(token).then((user)=>{
+  console.log("finally")
+  console.log(user)
+  res.send(user)
+}).catch((e)=>{
+  console.log('failed from me')
+})
+})
+
+app.post('/user',(req,res)=>{
+  var body =_.pick(req.body,['email','password'])
+  var user = new User(body)
+  user.save().then((user)=>{
+ //   res.send(user)
+ return user.generateAuth()
+}).then((token)=>{
+//  console.log('inside guys')
+//  console.log(token)
+ res.header('x-auth',token).send(user)
+}).catch((e)=>{
+    console.log(e)
+    res.status(400).send(e)
+  })
+})
 
 app.delete('/todo/:id',(req,res)=>{
   var id = req.params.id
